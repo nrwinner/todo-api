@@ -2,6 +2,7 @@ import { DataStore } from "../interfaces/datastore";
 import { Task } from "../types/Task";
 import { TaskQuery } from "../types/Query";
 import { MongoClient, Db, ObjectId } from 'mongodb';
+import { ResourceError, ServiceError, ResourceErrorType, RequestError, RequestErrorType } from '../errors/Error';
 
 enum Collections {
   TASKS = 'tasks'
@@ -29,13 +30,27 @@ export class MongoDriver implements DataStore {
   }
 
   async getTask(taskId: string): Promise<Task> {
-    const task = await this.db.collection(Collections.TASKS).findOne({ '_id': new ObjectId(taskId) });
+    let objectId: ObjectId;
+
+    try {
+      objectId = new ObjectId(taskId)
+    } catch (_) {
+      throw ResourceErrorType.NOT_FOUND();
+    }
+
+    const task = await this.db.collection(Collections.TASKS).findOne({ '_id': objectId });
+
+    if (!task) {
+      // task wasn't found
+      throw ResourceErrorType.NOT_FOUND();
+    }
+
     // we assert Partial<Task> here to Task since we are enforcing a complete task upon insertion
     return Task.from(task) as Task;
   }
 
   getTasks(query: TaskQuery): Promise<Task[]> {
-    throw Error('Not yet implemented')
+    throw new ServiceError('Not yet implemented');
   }
 
   async createTask(task: Partial<Task>): Promise<string> {
@@ -44,10 +59,34 @@ export class MongoDriver implements DataStore {
   }
 
   async updateTask(task: Partial<Task>): Promise<void> {
-    await this.db.collection(Collections.TASKS).updateOne({ _id: new ObjectId(task.id) }, { $set: task.insertableTask })
+    let objectId: ObjectId;
+
+    try {
+      objectId = new ObjectId(task.id)
+    } catch (_) {
+      throw ResourceErrorType.NOT_FOUND();
+    }
+
+    const result = await this.db.collection(Collections.TASKS).updateOne({ _id: objectId }, { $set: task.insertableTask })
+
+    if (result.matchedCount === 0) {
+      throw ResourceErrorType.NOT_FOUND();
+    }
   }
 
   async deleteTask(taskId: string): Promise<void> {
-    await this.db.collection(Collections.TASKS).deleteOne({ _id: new ObjectId(taskId) })
+    let objectId: ObjectId;
+
+    try {
+      objectId = new ObjectId(taskId)
+    } catch (_) {
+      throw ResourceErrorType.NOT_FOUND();
+    }
+
+    const result = await this.db.collection(Collections.TASKS).deleteOne({ _id: objectId })
+
+    if (result.deletedCount === 0) {
+      throw ResourceErrorType.NOT_FOUND();
+    }
   }
 }

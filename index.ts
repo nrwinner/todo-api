@@ -33,5 +33,5 @@ app.all('*', async (_, res) => {
 
 // set app to listen on port 3000
 app.listen('3000', () => {
-  console.log('TODO Api listening on port 3000')
+  console.log('TODO API listening on port 3000')
 })

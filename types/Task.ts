@@ -32,7 +32,7 @@ export class Task {
   }
 
   get isValid(): boolean {
-    if (!this.title || (!this.dueDate || this.todoDate)) {
+    if (!this.title || (!this.dueDate && !this.todoDate)) {
       return false;
     }
 
