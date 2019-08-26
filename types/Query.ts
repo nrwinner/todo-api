@@ -8,6 +8,7 @@ export interface TaskQuery extends Query {
   description?: string;
   dueDate?: Date;
   todoDate?: Date;
+  completed?: boolean;
 }
 
 export namespace CreateQuery {
@@ -34,6 +35,10 @@ export namespace CreateQuery {
   
     if (data.description) {
       q.description = data.description;
+    }
+
+    if (data.completed) {
+      q.completed = data.completed;
     }
   
     if (data.dueDate) {

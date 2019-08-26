@@ -1,18 +1,20 @@
 export class Task {
   id?: string;
   title: string;
-  description: string;
+  description?: string;
   dueDate?: Date;
   todoDate?: Date;
+  completed: boolean = false;
 
   constructor();
-  constructor(id: string, title: string, description: string, dueDate?: Date, todoDate?: Date);
-  constructor(id?: string, title?: string, description?: string, dueDate?: Date, todoDate?: Date) {
+  constructor(id: string, title: string, description?: string, dueDate?: Date, todoDate?: Date, completed?: boolean);
+  constructor(id?: string, title?: string, description?: string, dueDate?: Date, todoDate?: Date, completed?: boolean) {
     this.id = id;
     this.title = title;
     this.description = description;
     this.dueDate = dueDate;
     this.todoDate = todoDate;
+    this.completed = completed;
   }
 
   get shouldDoToday(): boolean {
@@ -71,6 +73,10 @@ export class Task {
 
     if (data.description) {
       t.description = data.description;
+    }
+
+    if (data.completed) {
+      t.completed = data.completed;
     }
 
     if (data.dueDate) {
