@@ -2,7 +2,7 @@ import { DataStore } from "../interfaces/datastore";
 import { Task } from "../types/Task";
 import { TaskQuery } from "../types/Query";
 import { MongoClient, Db, ObjectId } from 'mongodb';
-import { ResourceError, ServiceError, ResourceErrorType, RequestError, RequestErrorType } from '../errors/Error';
+import { ResourceErrorType } from '../errors/Error';
 
 enum Collections {
   TASKS = 'tasks'
@@ -49,8 +49,49 @@ export class MongoDriver implements DataStore {
     return Task.from(task) as Task;
   }
 
-  getTasks(query: TaskQuery): Promise<Task[]> {
-    throw new ServiceError('Not yet implemented');
+  async getTasks(query: TaskQuery): Promise<Task[]> {
+    const _query = {};
+
+    // build _query object
+    if (query.title) {
+      _query['title'] = {
+        $regex: query.title
+      }
+    }
+
+    if (query.description) {
+      _query['description'] = {
+        $regex: query.description
+      }
+    }
+
+    if (query.dueDate) {
+      _query['dueDate'] = {
+        $gte: generalizeDate(query.dueDate),
+        $lt: generalizeDate(addDaysToDate(query.dueDate, 1))
+      }
+    }
+
+    if (query.todoDate) {
+      _query['todoDate'] = {
+        $gte: generalizeDate(query.todoDate),
+        $lt: generalizeDate(addDaysToDate(query.todoDate, 1))
+      }
+    }
+
+    let cursor = await this.db.collection(Collections.TASKS).find(_query);
+
+    if (query.offset) {
+      cursor.skip(query.offset)
+    }
+
+    if (query.limit) {
+      cursor.limit(query.limit) 
+    }
+
+    const results = await cursor.toArray();
+
+    return results.map(t => Task.from(t) as Task);
   }
 
   async createTask(task: Partial<Task>): Promise<string> {
@@ -89,4 +130,13 @@ export class MongoDriver implements DataStore {
       throw ResourceErrorType.NOT_FOUND();
     }
   }
+}
+
+function generalizeDate(date: Date) {
+  return new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())
+}
+
+function addDaysToDate(date: Date, days: number): Date {
+  date.setDate(date.getDate() + days);
+  return date;
 }

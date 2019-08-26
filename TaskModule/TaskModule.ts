@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { DataStore } from '../interfaces/datastore';
 import * as Interactor from './TaskInteractor';
 import { Task } from '../types/Task';
+import { CreateQuery } from '../types/Query';
 import * as Error from '../errors/Error';
 
 export class TaskModule {
@@ -17,9 +18,11 @@ export class TaskModule {
       }
     }
 
-    const getTasks = (req: Request, res: Response) => {
+    const getTasks = async (req: Request, res: Response) => {
       try {
-        throw new Error.ServiceError('Route not yet implemented');
+        const query = CreateQuery.taskQueryFrom(req.query);
+        const tasks = await Interactor.getTasks(query, dataStore);
+        res.send(tasks);
       } catch (error) {
         handleError(error, res);
       }
