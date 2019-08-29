@@ -14,7 +14,7 @@ export class Task {
     this.description = description;
     this.dueDate = dueDate;
     this.todoDate = todoDate;
-    this.completed = completed;
+    this.completed = completed || false;
   }
 
   get shouldDoToday(): boolean {

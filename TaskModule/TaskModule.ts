@@ -41,7 +41,7 @@ export class TaskModule {
         }
 
         const taskId = await Interactor.createTask(Task.from(req.body.task), dataStore);
-        res.status(201).send(taskId);
+        res.status(201).json({ taskId });
       } catch (error) {
         handleError(error, res);
       }

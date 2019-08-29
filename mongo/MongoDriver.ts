@@ -79,6 +79,20 @@ export class MongoDriver implements DataStore {
       }
     }
 
+    if (_query['todoDate'] && _query['dueDate']) {
+      // set this to an $or operation and delete the original params
+      _query['$or'] = [
+        { todoDate: _query['todoDate'] },
+        { dueDate: _query['dueDate'] },
+      ]
+
+      delete _query['todoDate'];
+      delete _query['dueDate'];
+    }
+
+    // @ts-ignore
+    console.log(_query)
+
     let cursor = await this.db.collection(Collections.TASKS).find(_query);
 
     if (query.offset) {
@@ -133,7 +147,7 @@ export class MongoDriver implements DataStore {
 }
 
 function generalizeDate(date: Date) {
-  return new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate())
 }
 
 function addDaysToDate(date: Date, days: number): Date {

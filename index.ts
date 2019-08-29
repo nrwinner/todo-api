@@ -3,6 +3,7 @@ import { MongoDriver } from './mongo/MongoDriver';
 import { TaskModule } from './TaskModule/TaskModule';
 import * as dotenv from 'dotenv';
 import * as bodyParser from 'body-parser';
+import * as cors from 'cors';
 
 // configure dotenv
 dotenv.config();
@@ -13,6 +14,9 @@ const app = express();
 // use body parser
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+// configure cors
+app.use(cors({ origin: '*' }))
 
 // retrieve new express Router
 const router = express.Router();

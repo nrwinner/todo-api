@@ -62,3 +62,6 @@ typings/
 
 # typescript build
 dist
+
+# other
+.DS_Store
