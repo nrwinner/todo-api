@@ -1,13 +1,16 @@
 import { Router, Request, Response } from 'express';
-import { DataStore } from '../interfaces/datastore';
+import { TaskDataStore } from './TaskDataStore';
 import * as Interactor from './TaskInteractor';
 import { Task } from '../types/Task';
 import { CreateQuery } from '../types/Query';
 import * as Error from '../errors/Error';
+import { TaskMongoDriver } from './TaskMongoDriver';
 
 export class TaskModule {
 
-  public static init(router: Router, dataStore: DataStore) {
+  public static init(router: Router) {
+
+    const dataStore: TaskDataStore = new TaskMongoDriver();
 
     const getTask = async (req: Request, res: Response) => {
       try {

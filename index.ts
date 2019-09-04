@@ -1,5 +1,5 @@
 import * as express from 'express';
-import { MongoDriver } from './mongo/MongoDriver';
+import { TaskMongoDriver } from './TaskModule/TaskMongoDriver';
 import { TaskModule } from './TaskModule/TaskModule';
 import * as dotenv from 'dotenv';
 import * as bodyParser from 'body-parser';
@@ -21,11 +21,8 @@ app.use(cors({ origin: '*' }))
 // retrieve new express Router
 const router = express.Router();
 
-// create instance of DataStore
-const dataStore = new MongoDriver();
-
 // init modules
-TaskModule.init(router, dataStore);
+TaskModule.init(router);
 
 // use our complete router
 app.use(router);

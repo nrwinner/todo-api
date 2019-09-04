@@ -1,32 +1,33 @@
-import { DataStore } from "../interfaces/datastore";
-import { Task } from "../types/Task";
-import { TaskQuery } from "../types/Query";
-import { MongoClient, Db, ObjectId } from 'mongodb';
-import { ResourceErrorType } from '../errors/Error';
+import { TaskDataStore } from './TaskDataStore';
+import { Task } from '../types/Task';
+import { TaskQuery } from '../types/Query';
+import { Db, ObjectId, MongoClient } from 'mongodb';
+import { ResourceErrorType, ServiceError } from '../errors/Error';
+import { MongoConnector } from '../mongo/connect';
 
 enum Collections {
   TASKS = 'tasks'
 }
 
-export class MongoDriver implements DataStore {
-  private db: Db;
+export class TaskMongoDriver implements TaskDataStore {
+  private connector = MongoConnector.instance;
+  private _db: Db;
 
-  constructor() {
-    this.connect();
-  }
+  constructor() { }
 
-  private connect() {
-    let connectionString = process.env.MONGO_CONNECTION_STRING;
-    connectionString = connectionString.replace('<username>', process.env.MONGO_USERNAME)
-    connectionString = connectionString.replace('<password>', process.env.MONGO_PASSWORD)
-
-    MongoClient.connect(connectionString, { useUnifiedTopology: true, useNewUrlParser: true }, (err, client: MongoClient) => {
-      if (!err) {
-        this.db = client.db('todo');
-      } else {
-        throw new Error('Couldn\'t connect to Mongo!');
-      }
-    })
+  get db(): Promise<Db> {
+    if (this._db) {
+      return Promise.resolve(this._db);
+    } else {
+      return new Promise<Db>((resolve) => {
+        this.connector.connection.then((client: MongoClient) => {
+          this._db = client.db('todo');
+          resolve(this._db);
+        })
+      }).catch(error => {
+        throw new ServiceError('Service failed to connect to Mongo');
+      })
+    }
   }
 
   async getTask(taskId: string): Promise<Task> {
@@ -38,7 +39,7 @@ export class MongoDriver implements DataStore {
       throw ResourceErrorType.NOT_FOUND();
     }
 
-    const task = await this.db.collection(Collections.TASKS).findOne({ '_id': objectId });
+    const task = await (await this.db).collection(Collections.TASKS).findOne({ '_id': objectId });
 
     if (!task) {
       // task wasn't found
@@ -90,10 +91,7 @@ export class MongoDriver implements DataStore {
       delete _query['dueDate'];
     }
 
-    // @ts-ignore
-    console.log(_query)
-
-    let cursor = await this.db.collection(Collections.TASKS).find(_query);
+    let cursor = await (await this.db).collection(Collections.TASKS).find(_query);
 
     if (query.offset) {
       cursor.skip(query.offset)
@@ -109,7 +107,7 @@ export class MongoDriver implements DataStore {
   }
 
   async createTask(task: Partial<Task>): Promise<string> {
-    const result = await this.db.collection(Collections.TASKS).insertOne(task.insertableTask);
+    const result = await (await this.db).collection(Collections.TASKS).insertOne(task.insertableTask);
     return result.insertedId.toHexString();
   }
 
@@ -122,7 +120,7 @@ export class MongoDriver implements DataStore {
       throw ResourceErrorType.NOT_FOUND();
     }
 
-    const result = await this.db.collection(Collections.TASKS).updateOne({ _id: objectId }, { $set: task.insertableTask })
+    const result = await (await this.db).collection(Collections.TASKS).updateOne({ _id: objectId }, { $set: task.insertableTask })
 
     if (result.matchedCount === 0) {
       throw ResourceErrorType.NOT_FOUND();
@@ -138,7 +136,7 @@ export class MongoDriver implements DataStore {
       throw ResourceErrorType.NOT_FOUND();
     }
 
-    const result = await this.db.collection(Collections.TASKS).deleteOne({ _id: objectId })
+    const result = await (await this.db).collection(Collections.TASKS).deleteOne({ _id: objectId })
 
     if (result.deletedCount === 0) {
       throw ResourceErrorType.NOT_FOUND();
