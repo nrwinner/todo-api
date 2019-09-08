@@ -1,81 +1,61 @@
 import { Router, Request, Response } from 'express';
-import * as Error from '../errors/Error';
-import { UserMongoDriver } from './UserMongoDriver';
 import { handleError } from '../helpers/routing helpers/errors';
 import { authenticated } from '../guards/guards';
-import * as Interactor from './UserInterator';
+import { UserInteractor } from './UserInterator';
 import { User } from '../types/User';
-
-const dataStore = new UserMongoDriver();
+import { CatchRouteError } from '../helpers/routing helpers/catchRouteError';
 
 export class UserModule {
 
-  @authenticated
-  private static async getUser(req: Request, res: Response) {
-    try {
-      const user = await Interactor.getUser(dataStore, { id: req.params.identifier });
-      res.json(user)
-    }
-    catch (error) {
-      handleError(error, res)
-    }
-  }
+  private interactor: UserInteractor;
 
-  @authenticated
-  private static async getUsers(req: Request, res: Response) {
-    try {
-      const users = await Interactor.getUsers(dataStore, req.params.query);
-      res.json(users);
-    }
-    catch (error) {
-      handleError(error, res)
-    }
-  }
-
-  @authenticated
-  private static async createUser(req: Request, res: Response) {
-    try {
-      const user = User.from(req.body.user);
-      const insertedId = await Interactor.createUser(dataStore, user);
-      res.send(insertedId);
-    }
-    catch (error) {
-      handleError(error, res)
-    }
-  }
-
-  @authenticated
-  private static async updateUser(req: Request, res: Response) {
-    try {
-      const user = User.from(req.body.user);
-      await Interactor.updateUser(dataStore, { id: req.params.identifier }, user);
-      res.sendStatus(204);
-    }
-    catch (error) {
-      handleError(error, res)
-    }
-  }
-
-  @authenticated
-  private static async deleteUser(req: Request, res: Response) {
-    try {
-      await Interactor.deleteUser(dataStore, { id: req.params.identifier });
-      res.sendStatus(204);
-    }
-    catch (error) {
-      handleError(error, res)
-    }
-  }
-
-  public static init(router: Router) {
+  constructor(router: Router) {
+    this.interactor = new UserInteractor();
 
     router.route('/users')
-      .get(this.getUsers)
-      .post(this.createUser)
-      
-      router.route('/users/:identifier')
-      .get(this.getUser)
-      .patch(this.updateUser)
-      .delete(this.deleteUser)
+      .get(this.getUsers.bind(this))
+      .post(this.createUser.bind(this))
+
+    router.route('/users/:identifier')
+      .get(this.getUser.bind(this))
+      .patch(this.updateUser.bind(this))
+      .delete(this.deleteUser.bind(this))
+  }
+
+  @CatchRouteError(handleError)
+  @authenticated
+  private async getUser(req: Request, res: Response) {
+    const user = await this.interactor.getUser({ id: req.params.identifier });
+    res.json(user)
+  }
+
+  @CatchRouteError(handleError)
+  @authenticated
+  private async getUsers(req: Request, res: Response) {
+    const users = await this.interactor.getUsers(req.params.query);
+    res.json(users);
+  }
+
+  @CatchRouteError(handleError)
+  @authenticated
+  private async createUser(req: Request, res: Response) {
+    const user = User.from(req.body.user);
+    const insertedId = await this.interactor.createUser(user);
+    res.send(insertedId);
+  }
+
+  @CatchRouteError(handleError)
+  @authenticated
+  private async updateUser(req: Request, res: Response) {
+    const user = User.from(req.body.user);
+    await this.interactor.updateUser({ id: req.params.identifier }, user);
+    res.sendStatus(204);
+  }
+
+  @CatchRouteError(handleError)
+  @authenticated
+  private async deleteUser(req: Request, res: Response) {
+    await this.interactor.deleteUser({ id: req.params.identifier });
+    res.sendStatus(204);
   }
 }

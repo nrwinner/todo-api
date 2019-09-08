@@ -40,7 +40,7 @@ const router = express.Router();
 
 // init modules
 TaskModule.init(router);
-UserModule.init(router);
+new UserModule(router);
 
 // use our complete router
 app.use(router);
