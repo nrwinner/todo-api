@@ -6,6 +6,7 @@ import * as cors from 'cors';
 // Modules
 import { TaskModule } from './TaskModule/TaskModule';
 import { UserModule } from './UserModule/UserModule';
+import { AuthModule } from './AuthModule/AuthModule';
 
 // configure dotenv
 dotenv.config();
@@ -41,6 +42,7 @@ const router = express.Router();
 // init modules
 TaskModule.init(router);
 new UserModule(router);
+new AuthModule(router);
 
 // use our complete router
 app.use(router);

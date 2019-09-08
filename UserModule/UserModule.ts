@@ -14,7 +14,6 @@ export class UserModule {
 
     router.route('/users')
       .get(this.getUsers.bind(this))
-      .post(this.createUser.bind(this))
 
     router.route('/users/:identifier')
       .get(this.getUser.bind(this))
@@ -26,22 +25,14 @@ export class UserModule {
   @authenticated
   private async getUser(req: Request, res: Response) {
     const user = await this.interactor.getUser({ id: req.params.identifier });
-    res.json(user)
+    res.json(user.respondableUser)
   }
 
   @CatchRouteError(handleError)
   @authenticated
   private async getUsers(req: Request, res: Response) {
     const users = await this.interactor.getUsers(req.params.query);
-    res.json(users);
-  }
-
-  @CatchRouteError(handleError)
-  @authenticated
-  private async createUser(req: Request, res: Response) {
-    const user = User.from(req.body.user);
-    const insertedId = await this.interactor.createUser(user);
-    res.send(insertedId);
+    res.json(users.map(u => u.respondableUser));
   }
 
   @CatchRouteError(handleError)

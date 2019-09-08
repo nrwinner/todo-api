@@ -3,11 +3,16 @@ export class User {
   fname: string;
   lname: string;
   username: string;
+  passwordHash: string;
   email: string;
   lastLoggedIn?: Date;
 
-  static from(data: Partial<User> | { [P in keyof User]: string }) {
+  static from(data: any) {
     const user = new User();
+    
+    if (data._id) {
+      user.id = data._id;
+    }
 
     if (data.id) {
       user.id = data.id;
@@ -23,6 +28,10 @@ export class User {
 
     if (data.username) {
       user.username = data.username;
+    }
+
+    if (data.passwordHash) {
+      user.passwordHash = data.passwordHash;
     }
 
     if (data.email) {
@@ -42,8 +51,25 @@ export class User {
 
   get insertableUser(): Omit<User, 'id'> {
     const u = Object.assign({}, this) as User;
+
     // always remove id
     delete u.id;
+
+    // remove null properties
+    for (let k in u) {
+      if (u[k] === null || u[k] === undefined) {
+        delete u[k];
+      }
+    }
+
+    return u;
+  }
+
+  get respondableUser(): Omit<User, 'passwordHash'> {
+    const u = Object.assign({}, this) as User;
+
+    // always remove password
+    delete u.passwordHash;
 
     // remove null properties
     for (let k in u) {
