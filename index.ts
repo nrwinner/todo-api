@@ -1,9 +1,11 @@
 import * as express from 'express';
-import { TaskMongoDriver } from './TaskModule/TaskMongoDriver';
-import { TaskModule } from './TaskModule/TaskModule';
 import * as dotenv from 'dotenv';
 import * as bodyParser from 'body-parser';
 import * as cors from 'cors';
+
+// Modules
+import { TaskModule } from './TaskModule/TaskModule';
+import { UserModule } from './UserModule/UserModule';
 
 // configure dotenv
 dotenv.config();
@@ -16,13 +18,29 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 // configure cors
-app.use(cors({ origin: '*' }))
+app.use(cors({ origin: '*' }));
+
+// configure authentication middleware
+app.use((req, res, next) => {
+  const authorHeaders = req.headers.authorization || undefined;
+  
+  if (authorHeaders) {
+    const [type, token] = [authorHeaders.split(' ')[0], authorHeaders.split(' ').slice(1).join('')]
+
+    if (type === 'Bearer') {
+      req['user'] = token;
+    }
+  }
+
+  next();
+});
 
 // retrieve new express Router
 const router = express.Router();
 
 // init modules
 TaskModule.init(router);
+UserModule.init(router);
 
 // use our complete router
 app.use(router);

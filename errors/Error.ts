@@ -39,6 +39,8 @@ export class RequestError extends Error {
 export const RequestErrorType = {
   MISSING_PROPERTY: (additionalInformation?: string) => new RequestError(400, 'Missing Property', additionalInformation),
   MISMATCHED_PROPERTY: (additionalInformation?: string) => new RequestError(400, 'Mismatched Property', additionalInformation),
+  UNAUTHENTICATED: (additionalInformation?: string) => new RequestError(403, 'Forbidden', additionalInformation),
+  UNAUTHORIZED: (additionalInformation?: string) => new RequestError(401, 'Unauthorized', additionalInformation),
 }
 
 

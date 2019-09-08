@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es2017",
+    "target": "es5",
     "module": "commonjs",
     "moduleResolution": "node",
     "sourceMap": false,
@@ -14,9 +14,9 @@
     "noImplicitAny": true,
     "suppressImplicitAnyIndexErrors": true,
     "downlevelIteration": true,
-    "allowUnusedLabels": false,
+    "allowUnusedLabels": false
   },
   "exclude": [
-    "node_modules",
+    "node_modules"
   ]
 }

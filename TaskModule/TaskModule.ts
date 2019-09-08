@@ -5,6 +5,7 @@ import { Task } from '../types/Task';
 import { CreateQuery } from '../types/Query';
 import * as Error from '../errors/Error';
 import { TaskMongoDriver } from './TaskMongoDriver';
+import { handleError } from '../helpers/routing helpers/errors';
 
 export class TaskModule {
 
@@ -93,19 +94,4 @@ export class TaskModule {
       .patch(updateTask)
       .delete(deleteTask)
   }
-}
-
-function mapError(error: any): Error.Error {
-  if (error instanceof Error.Error) {
-    return error;
-  }
-
-  console.error(error);
-
-  return new Error.ServiceError();
-}
-
-function handleError(e: any, res: Response) {
-  const error: Error.Error = mapError(e);
-  res.status(error.code).send(error.responsePayload)
 }
