@@ -1,3 +1,7 @@
+export enum AccessGroup {
+  ADMIN = 'admin'
+}
+
 export class User {
   id?: string;
   fname: string;
@@ -6,6 +10,7 @@ export class User {
   passwordHash: string;
   email: string;
   lastLoggedIn?: Date;
+  accessGroups: AccessGroup[];
 
   static from(data: any) {
     const user = new User();
@@ -46,6 +51,10 @@ export class User {
       }
     }
 
+    if (data.accessGroups) {
+      user.accessGroups = data.accessGroups;
+    }
+
     return user;
   }
 
@@ -79,5 +88,26 @@ export class User {
     }
 
     return u;
+  }
+}
+
+export class UserIdentifier {
+
+  constructor(public id?: string, public username?: string) {
+    if (!id && !username) {
+      throw new Error('Cannot instantiate a UserIdentifier without a username or id');
+    }
+  }
+
+  get plainObject(): { id?: string, username?: string, [key: string]: any } {
+    const obj = { id: this.id, username: this.username };
+
+    for (let k in obj) {
+      if (obj[k] === null || obj[k] === undefined) {
+        delete obj[k];
+      }
+    }
+
+    return obj;
   }
 }

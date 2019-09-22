@@ -12,15 +12,14 @@ export class AuthModule {
   constructor(router: Router) {
     this.interactor = new AuthInteractor();
 
-    router.route('/users/tokens')
+    router.route('/users')
       .post(this.register.bind(this))
 
-    router.route('/users')
+    router.route('/users/tokens')
       .post(this.login.bind(this))
 
     router.route('/users/:identifier/tokens')
       // .patch(this.refresh.bind(this))
-      .delete(this.logout.bind(this))
   }
 
   @CatchRouteError(handleError)
@@ -33,12 +32,5 @@ export class AuthModule {
   private async register(req: Request, res: Response) {
     const token = await this.interactor.register(Object.assign(User.from(req.body.user), { password: req.body.user.password }));
     res.send(token)
-  }
-
-  @CatchRouteError(handleError)
-  @authenticated
-  private async logout(req: Request, res: Response) {
-    await this.interactor.logout(req['user']);
-    res.sendStatus(204)
   }
 }

@@ -7,6 +7,7 @@ import * as cors from 'cors';
 import { TaskModule } from './TaskModule/TaskModule';
 import { UserModule } from './UserModule/UserModule';
 import { AuthModule } from './AuthModule/AuthModule';
+import { decodeToken } from './helpers/TokenManager';
 
 // configure dotenv
 dotenv.config();
@@ -22,14 +23,14 @@ app.use(bodyParser.json());
 app.use(cors({ origin: '*' }));
 
 // configure authentication middleware
-app.use((req, res, next) => {
+app.use((req, _, next) => {
   const authorHeaders = req.headers.authorization || undefined;
   
   if (authorHeaders) {
     const [type, token] = [authorHeaders.split(' ')[0], authorHeaders.split(' ').slice(1).join('')]
 
     if (type === 'Bearer') {
-      req['user'] = token;
+      req['user'] = decodeToken(token);
     }
   }
 
@@ -40,9 +41,9 @@ app.use((req, res, next) => {
 const router = express.Router();
 
 // init modules
-TaskModule.init(router);
-new UserModule(router);
 new AuthModule(router);
+new TaskModule(router);
+new UserModule(router);
 
 // use our complete router
 app.use(router);

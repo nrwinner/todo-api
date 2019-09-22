@@ -1,6 +1,4 @@
-import { Response } from 'express';
 import { RequestErrorType } from "../errors/Error";
-import { handleError } from "../helpers/routing helpers/errors";
 
 export function authenticated(target: any, name: any, descriptor: any) { 
   const original = descriptor.value;

@@ -1,9 +1,9 @@
 import { Router, Request, Response } from 'express';
-import { handleError } from '../helpers/routing helpers/errors';
-import { authenticated } from '../guards/guards';
 import { UserInteractor } from './UserInterator';
-import { User } from '../types/User';
+import { User, UserIdentifier, AccessGroup } from '../types/User';
 import { CatchRouteError } from '../helpers/routing helpers/catchRouteError';
+import { authenticated, authorized } from '../guards/guards';
+import { handleError } from '../helpers/routing helpers/errors';
 
 export class UserModule {
 
@@ -22,13 +22,15 @@ export class UserModule {
   }
 
   @CatchRouteError(handleError)
+  @authorized(AccessGroup.ADMIN)
   @authenticated
   private async getUser(req: Request, res: Response) {
-    const user = await this.interactor.getUser({ id: req.params.identifier });
+    const user = await this.interactor.getUser(new UserIdentifier(req.params.identifier));
     res.json(user.respondableUser)
   }
 
   @CatchRouteError(handleError)
+  @authorized(AccessGroup.ADMIN)
   @authenticated
   private async getUsers(req: Request, res: Response) {
     const users = await this.interactor.getUsers(req.params.query);
@@ -36,17 +38,19 @@ export class UserModule {
   }
 
   @CatchRouteError(handleError)
+  @authorized(AccessGroup.ADMIN)
   @authenticated
   private async updateUser(req: Request, res: Response) {
     const user = User.from(req.body.user);
-    await this.interactor.updateUser({ id: req.params.identifier }, user);
+    await this.interactor.updateUser(new UserIdentifier(req.params.identifier), user);
     res.sendStatus(204);
   }
 
   @CatchRouteError(handleError)
+  @authorized(AccessGroup.ADMIN)
   @authenticated
   private async deleteUser(req: Request, res: Response) {
-    await this.interactor.deleteUser({ id: req.params.identifier });
+    await this.interactor.deleteUser(new UserIdentifier(req.params.identifier));
     res.sendStatus(204);
   }
 }

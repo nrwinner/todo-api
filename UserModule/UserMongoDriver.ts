@@ -2,7 +2,7 @@ import { UserDataStore } from './UserDataStore';
 import { MongoConnector } from '../mongo/connect';
 import { Db, MongoClient, ObjectID, ObjectId } from 'mongodb';
 import { ServiceError, ResourceErrorType } from '../errors/Error';
-import { User } from '../types/User';
+import { User, UserIdentifier } from '../types/User';
 
 enum Collections {
   USERS = 'users'
@@ -33,25 +33,15 @@ export class UserMongoDriver implements UserDataStore {
     throw new ServiceError('Method not implemented.');
   }
 
-  async getUser(identifier: { id?: string; username?: string; }): Promise<User> {
-    if (identifier.id) {
-      try {
-        // @ts-ignore
-        identifier._id = new ObjectId(identifier.id);
-      } catch (_) {
-        if (!identifier.username) {
-          identifier.username = identifier.id;
-        }
-      }
+  async getUser(identifier: UserIdentifier): Promise<User> {
+    const mongoIdentifier = userIdentifierToMongo(identifier);
 
-      delete identifier.id;
-    }
 
-    if (!identifier || (!identifier.id && !identifier.username)) {
+    if (!mongoIdentifier || (!mongoIdentifier._id && !mongoIdentifier.username)) {
       throw ResourceErrorType.NOT_FOUND();
     }
 
-    let user = await (await this.db).collection(Collections.USERS).findOne(identifier);
+    let user = await (await this.db).collection(Collections.USERS).findOne(mongoIdentifier);
 
     if (!user) {
       throw ResourceErrorType.NOT_FOUND();
@@ -61,46 +51,56 @@ export class UserMongoDriver implements UserDataStore {
   }
 
   async createUser(user: Partial<User>): Promise<string> {
+
+    // if there is an eroneous ID property, delete it on creation
+    if (user.id) {
+      delete user.id;
+    }
+
     const result = await (await this.db).collection(Collections.USERS).insertOne(user.insertableUser)
     return result.insertedId.toHexString();
   }
 
-  async updateUser(identifier: { id?: string; username?: string; }, user: Partial<User>): Promise<void> {
-    if (identifier.id) {
-      try {
-        // @ts-ignore
-        identifier._id = new ObjectId(identifier.id);
-      } catch (_) {
-        if (!identifier.username) {
-          identifier.username = identifier.id;
-        }
-      }
+  async updateUser(identifier: UserIdentifier, user: Partial<User>): Promise<void> {
+    const mongoIdentifier = userIdentifierToMongo(identifier);
 
-      delete identifier.id;
+    if (!mongoIdentifier || (!mongoIdentifier._id && !mongoIdentifier.username)) {
+      throw ResourceErrorType.NOT_FOUND();
     }
 
-    await (await this.db).collection(Collections.USERS).updateOne(identifier, { $set: user.insertableUser })
+    const result = await (await this.db).collection(Collections.USERS).updateOne(mongoIdentifier, { $set: user.insertableUser })
+
+    if (result.modifiedCount === 0 && result.upsertedCount === 0) {
+      throw ResourceErrorType.NOT_FOUND();
+    }
   }
 
-  async deleteUser(identifier: { id?: string; username?: string; }): Promise<void> {
-    if (identifier.id) {
-      try {
-        // @ts-ignore
-        identifier._id = new ObjectId(identifier.id);
-      } catch (_) {
-        if (!identifier.username) {
-          identifier.username = identifier.id;
-        }
-      }
+  async deleteUser(identifier: UserIdentifier): Promise<void> {
+    const mongoIdentifier = userIdentifierToMongo(identifier);
 
-      delete identifier.id;
-    }
-
-    const result = await (await this.db).collection(Collections.USERS).deleteOne(identifier);
+    const result = await (await this.db).collection(Collections.USERS).deleteOne(mongoIdentifier);
 
     if (result.deletedCount === 0) {
       throw ResourceErrorType.NOT_FOUND();
     }
   }
 
+}
+
+function userIdentifierToMongo(identifier: UserIdentifier) {
+  const obj = identifier.plainObject;
+
+  if (obj.id) {
+    try {
+      obj._id = new ObjectId(obj.id);
+    } catch (_) {
+      if (!identifier.username) {
+        obj.username = obj.id;
+      }
+    }
+
+    delete obj.id;
+  }
+
+  return obj;
 }
