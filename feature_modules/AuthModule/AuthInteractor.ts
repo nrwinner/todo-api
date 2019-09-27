@@ -1,8 +1,8 @@
-import { User, UserIdentifier } from '../types/User';
-import { RequestErrorType } from '../errors/Error';
+import { User, UserIdentifier } from '../../types/User';
+import { RequestErrorType } from '../../errors/Error';
 import { UserModuleAdapter } from '../UserModule/UserModuleAdapter';
 import * as bcrypt from 'bcrypt';
-import { makeToken } from '../helpers/TokenManager';
+import { makeToken } from '../../helpers/TokenManager';
 
 export class AuthInteractor {
   

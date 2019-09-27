@@ -1,5 +1,5 @@
-import { Task } from '../types/Task';
-import { TaskQuery } from '../types/Query';
+import { Task } from '../../types/Task';
+import { TaskQuery } from '../../types/Query';
 
 export interface TaskDataStore {
   getTask(taskId: string): Promise<Task>;

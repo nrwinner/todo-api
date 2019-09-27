@@ -1,9 +1,9 @@
 import { Router, Request, Response } from 'express';
 import { UserInteractor } from './UserInterator';
-import { User, UserIdentifier, AccessGroup } from '../types/User';
-import { CatchRouteError } from '../helpers/routing helpers/catchRouteError';
-import { authenticated, authorized } from '../guards/guards';
-import { handleError } from '../helpers/routing helpers/errors';
+import { User, UserIdentifier, AccessGroup } from '../../types/User';
+import { CatchRouteError } from '../../helpers/routing helpers/catchRouteError';
+import { authenticated, authorized } from '../../guards/guards';
+import { handleError } from '../../helpers/routing helpers/errors';
 
 export class UserModule {
 

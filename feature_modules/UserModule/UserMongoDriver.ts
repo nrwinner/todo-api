@@ -1,8 +1,8 @@
 import { UserDataStore } from './UserDataStore';
-import { MongoConnector } from '../mongo/connect';
+import { MongoConnector } from '../../mongo/connect';
 import { Db, MongoClient, ObjectID, ObjectId } from 'mongodb';
-import { ServiceError, ResourceErrorType } from '../errors/Error';
-import { User, UserIdentifier } from '../types/User';
+import { ServiceError, ResourceErrorType } from '../../errors/Error';
+import { User, UserIdentifier } from '../../types/User';
 
 enum Collections {
   USERS = 'users'

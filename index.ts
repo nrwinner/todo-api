@@ -5,9 +5,9 @@ import * as cors from 'cors';
 import { decodeToken } from './helpers/TokenManager';
 
 // Modules
-import { TaskModule } from './TaskModule/TaskModule';
-import { UserModule } from './UserModule/UserModule';
-import { AuthModule } from './AuthModule/AuthModule';
+import { TaskModule } from './feature_modules/TaskModule/TaskModule';
+import { UserModule } from './feature_modules/UserModule/UserModule';
+import { AuthModule } from './feature_modules/AuthModule/AuthModule';
 
 // configure dotenv
 dotenv.config();

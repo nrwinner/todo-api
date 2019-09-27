@@ -1,9 +1,9 @@
 import { TaskDataStore } from './TaskDataStore';
-import { Task } from '../types/Task';
-import { TaskQuery } from '../types/Query';
+import { Task } from '../../types/Task';
+import { TaskQuery } from '../../types/Query';
 import { Db, ObjectId, MongoClient } from 'mongodb';
-import { ResourceErrorType, ServiceError } from '../errors/Error';
-import { MongoConnector } from '../mongo/connect';
+import { ResourceErrorType, ServiceError } from '../../errors/Error';
+import { MongoConnector } from '../../mongo/connect';
 
 enum Collections {
   TASKS = 'tasks'

@@ -1,6 +1,6 @@
 import { TaskDataStore } from "./TaskDataStore";
-import { Task } from "../types/Task";
-import { TaskQuery } from "../types/Query";
+import { Task } from "../../types/Task";
+import { TaskQuery } from "../../types/Query";
 import { TaskMongoDriver } from "./TaskMongoDriver";
 
 export class TaskInteractor {

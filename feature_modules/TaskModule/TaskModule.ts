@@ -1,12 +1,12 @@
 import { Router, Request, Response } from 'express';
 import { TaskInteractor } from './TaskInteractor';
-import { Task } from '../types/Task';
-import { CreateQuery } from '../types/Query';
-import * as Error from '../errors/Error';
-import { handleError } from '../helpers/routing helpers/errors';
-import { authenticated, authorized } from '../guards/guards';
-import { CatchRouteError } from '../helpers/routing helpers/catchRouteError';
-import { AccessGroup } from '../types/User';
+import { Task } from '../../types/Task';
+import { CreateQuery } from '../../types/Query';
+import * as Error from '../../errors/Error';
+import { handleError } from '../../helpers/routing helpers/errors';
+import { authenticated, authorized } from '../../guards/guards';
+import { CatchRouteError } from '../../helpers/routing helpers/catchRouteError';
+import { AccessGroup } from '../../types/User';
 
 export class TaskModule {
 
