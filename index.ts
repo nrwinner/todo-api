@@ -2,12 +2,12 @@ import * as express from 'express';
 import * as dotenv from 'dotenv';
 import * as bodyParser from 'body-parser';
 import * as cors from 'cors';
+import { decodeToken } from './helpers/TokenManager';
 
 // Modules
 import { TaskModule } from './TaskModule/TaskModule';
 import { UserModule } from './UserModule/UserModule';
 import { AuthModule } from './AuthModule/AuthModule';
-import { decodeToken } from './helpers/TokenManager';
 
 // configure dotenv
 dotenv.config();

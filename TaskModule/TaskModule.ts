@@ -35,16 +35,16 @@ export class TaskModule {
   }
 
   @CatchRouteError(handleError)
-  @authorized(AccessGroup.ADMIN)
   @authenticated
+  @authorized(AccessGroup.ADMIN)
   private async getTasks(req: Request, res: Response) {
     const query = CreateQuery.taskQueryFrom(req.query);
     const tasks = await this.interactor.getTasks(query);
     res.send(tasks);
   }
   @CatchRouteError(handleError)
-  @authorized(AccessGroup.ADMIN)
   @authenticated
+  @authorized(AccessGroup.ADMIN)
   private async createTask(req: Request, res: Response) {
     if (!req.body.task) {
       throw Error.RequestErrorType.MISSING_PROPERTY('Must include a valid `task` object in the request body');
@@ -61,8 +61,8 @@ export class TaskModule {
   }
 
   @CatchRouteError(handleError)
-  @authorized(AccessGroup.ADMIN)
   @authenticated
+  @authorized(AccessGroup.ADMIN)
   private async updateTask(req: Request, res: Response) {
     if (!req.body.task) {
       throw Error.RequestErrorType.MISSING_PROPERTY('Must include a partial `task` object in the request body');
@@ -82,8 +82,8 @@ export class TaskModule {
   }
 
   @CatchRouteError(handleError)
-  @authorized(AccessGroup.ADMIN)
   @authenticated
+  @authorized(AccessGroup.ADMIN)
   private async deleteTask(req: Request, res: Response) {
     await this.interactor.deleteTask(req.params.id);
     res.sendStatus(204);
