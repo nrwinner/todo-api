@@ -1,6 +1,6 @@
 import { UserInteractor } from './UserInterator';
-import { authenticated } from '../guards/guards';
-import { User, UserIdentifier } from '../types/User';
+import { authenticated } from '../../guards/guards';
+import { User, UserIdentifier } from '../../types/User';
 
 export class UserModuleAdapter {
 

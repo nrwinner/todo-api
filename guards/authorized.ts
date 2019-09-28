@@ -8,8 +8,8 @@ export class AuthorizationType {
 
   constructor(data: { user?: any, params?: { identifier?: string }, identifier?: string }) {
     this._user = data.user;
-    this._params = data.params;;
-    this._identifier = data.identifier;;
+    this._params = data.params;
+    this._identifier = data.identifier;
   }
 
   get isValid(): boolean {
@@ -26,7 +26,7 @@ export class AuthorizationType {
 }
 
 export function authorized(...accessGroups: AccessGroup[]) {
-  return (target: any, name: any, descriptor: any) => {
+  return (_: any, __: any, descriptor: any) => {
     const original = descriptor.value;
 
     if (typeof original === 'function') {
@@ -51,7 +51,7 @@ export function authorized(...accessGroups: AccessGroup[]) {
             throw RequestErrorType.UNAUTHORIZED();
           }
         } else {
-          throw RequestErrorType.UNAUTHORIZED();
+          throw RequestErrorType.UNAUTHENTICATED();
         }
 
       }

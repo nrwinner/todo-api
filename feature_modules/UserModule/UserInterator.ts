@@ -1,5 +1,5 @@
-import { User, UserIdentifier } from '../types/User';
-import { ServiceError } from '../errors/Error';
+import { User, UserIdentifier } from '../../types/User';
+import { ServiceError } from '../../errors/Error';
 import { UserDataStore } from './UserDataStore';
 import { UserMongoDriver } from './UserMongoDriver';
 

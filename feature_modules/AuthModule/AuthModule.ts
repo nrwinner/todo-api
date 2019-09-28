@@ -1,9 +1,9 @@
 import { Router, Request, Response } from 'express';
-import { handleError } from '../helpers/routing helpers/errors';
-import { authenticated } from '../guards/guards';
+import { handleError } from '../../helpers/routing helpers/errors';
+import { authenticated } from '../../guards/guards';
 import { AuthInteractor } from './AuthInteractor';
-import { User } from '../types/User';
-import { CatchRouteError } from '../helpers/routing helpers/catchRouteError';
+import { User } from '../../types/User';
+import { CatchRouteError } from '../../helpers/routing helpers/catchRouteError';
 
 export class AuthModule {
 

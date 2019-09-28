@@ -1,9 +1,9 @@
 import { TaskDataStore } from './TaskDataStore';
-import { Task } from '../types/Task';
-import { TaskQuery } from '../types/Query';
+import { Task } from '../../types/Task';
+import { TaskQuery } from '../../types/Query';
 import { Db, ObjectId, MongoClient } from 'mongodb';
-import { ResourceErrorType, ServiceError } from '../errors/Error';
-import { MongoConnector } from '../mongo/connect';
+import { ResourceErrorType, ServiceError } from '../../errors/Error';
+import { MongoConnector } from '../../mongo/connect';
 
 enum Collections {
   TASKS = 'tasks'
@@ -107,7 +107,7 @@ export class TaskMongoDriver implements TaskDataStore {
   }
 
   async createTask(task: Partial<Task>): Promise<string> {
-    const result = await (await this.db).collection(Collections.TASKS).insertOne(task.insertableTask);
+    const result = await (await this.db).collection(Collections.TASKS).insertOne(task.insertable);
     return result.insertedId.toHexString();
   }
 
@@ -120,7 +120,7 @@ export class TaskMongoDriver implements TaskDataStore {
       throw ResourceErrorType.NOT_FOUND();
     }
 
-    const result = await (await this.db).collection(Collections.TASKS).updateOne({ _id: objectId }, { $set: task.insertableTask })
+    const result = await (await this.db).collection(Collections.TASKS).updateOne({ _id: objectId }, { $set: task.insertable })
 
     if (result.matchedCount === 0) {
       throw ResourceErrorType.NOT_FOUND();

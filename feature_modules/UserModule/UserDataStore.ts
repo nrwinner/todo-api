@@ -1,4 +1,4 @@
-import { User, UserIdentifier } from '../types/User';
+import { User, UserIdentifier } from '../../types/User';
 
 export interface UserDataStore {
   // TODO param should be typed
