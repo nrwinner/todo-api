@@ -3,7 +3,7 @@ import * as jwt from 'jsonwebtoken';
 import { User } from '../types/User';
 
 export function makeToken(user: Partial<User>) {
-  return jwt.sign(user.respondableUser, process.env.SECRET, {
+  return jwt.sign(user.responseReady, process.env.SECRET, {
     expiresIn: '24h'
   });
 }

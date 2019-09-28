@@ -52,7 +52,7 @@ export class TaskModule {
 
     const task = Task.from(req.body.task);
 
-    if (!task.isValid) {
+    if (!task.title) {
       throw Error.RequestErrorType.MISSING_PROPERTY('Must include a valid `task` object in the request body');
     }
 

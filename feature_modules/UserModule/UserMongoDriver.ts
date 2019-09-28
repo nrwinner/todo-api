@@ -57,7 +57,7 @@ export class UserMongoDriver implements UserDataStore {
       delete user.id;
     }
 
-    const result = await (await this.db).collection(Collections.USERS).insertOne(user.insertableUser)
+    const result = await (await this.db).collection(Collections.USERS).insertOne(user.insertable)
     return result.insertedId.toHexString();
   }
 
@@ -68,7 +68,7 @@ export class UserMongoDriver implements UserDataStore {
       throw ResourceErrorType.NOT_FOUND();
     }
 
-    const result = await (await this.db).collection(Collections.USERS).updateOne(mongoIdentifier, { $set: user.insertableUser })
+    const result = await (await this.db).collection(Collections.USERS).updateOne(mongoIdentifier, { $set: user.insertable })
 
     if (result.modifiedCount === 0 && result.upsertedCount === 0) {
       throw ResourceErrorType.NOT_FOUND();

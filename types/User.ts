@@ -1,9 +1,10 @@
+import { Insertable } from './generics/Insertable';
+
 export enum AccessGroup {
   ADMIN = 'admin'
 }
 
-export class User {
-  id?: string;
+export class User extends Insertable {
   fname: string;
   lname: string;
   username: string;
@@ -11,6 +12,20 @@ export class User {
   email: string;
   lastLoggedIn?: Date;
   accessGroups: AccessGroup[];
+
+  constructor();
+  constructor(id: string, fname: string, lname: string, username: string, email: string, accessGroups?: AccessGroup[], lastLoggedIn?: Date, passwordHash?: string);
+  constructor(id?: string, fname?: string, lname?: string, username?: string, email?: string, accessGroups?: AccessGroup[], lastLoggedIn?: Date, passwordHash?: string) {
+    super(id);
+
+    this.fname = fname;
+    this.lname = lname;
+    this.username = username;
+    this.email =  email;
+    this.accessGroups = accessGroups || [];
+    this.passwordHash = passwordHash;
+    this.lastLoggedIn = lastLoggedIn;
+  }
 
   static from(data: any) {
     const user = new User();
@@ -58,23 +73,7 @@ export class User {
     return user;
   }
 
-  get insertableUser(): Omit<User, 'id'> {
-    const u = Object.assign({}, this) as User;
-
-    // always remove id
-    delete u.id;
-
-    // remove null properties
-    for (let k in u) {
-      if (u[k] === null || u[k] === undefined) {
-        delete u[k];
-      }
-    }
-
-    return u;
-  }
-
-  get respondableUser(): Omit<User, 'passwordHash'> {
+  get responseReady(): Omit<User, 'passwordHash'> {
     const u = Object.assign({}, this) as User;
 
     // always remove password

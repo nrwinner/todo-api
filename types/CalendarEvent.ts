@@ -1,5 +1,6 @@
-export class CalendarEvent {
-  id?: string;
+import { Insertable } from './generics/Insertable';
+
+export class CalendarEvent extends Insertable {
   title: string;
   description?: string;
   date: Date;
@@ -8,7 +9,8 @@ export class CalendarEvent {
   constructor();
   constructor(id: string, title: string, description?: string, date?: Date, lastUpdated?: Date);
   constructor(id?: string, title?: string, description?: string, date?: Date, lastUpdated?: Date) {
-    this.id = id;
+    super(id);
+
     this.title = title;
     this.description = description;
     this.date = date;
