@@ -30,7 +30,7 @@ export class TaskModule {
   @authorized(AccessGroup.ADMIN)
   @authenticated
   private async getTask(req: Request, res: Response) {
-    const task = await this.interactor.getTask(req.params.id);
+    const task = await this.interactor.getTask(req.params.id, req['user'].username);
     res.send(task);
   }
 
@@ -39,7 +39,7 @@ export class TaskModule {
   @authorized(AccessGroup.ADMIN)
   private async getTasks(req: Request, res: Response) {
     const query = CreateQuery.taskQueryFrom(req.query);
-    const tasks = await this.interactor.getTasks(query);
+    const tasks = await this.interactor.getTasks(query, req['user'].username);
     res.send(tasks);
   }
   @CatchRouteError(handleError)
@@ -56,7 +56,7 @@ export class TaskModule {
       throw Error.RequestErrorType.MISSING_PROPERTY('Must include a valid `task` object in the request body');
     }
 
-    const taskId = await this.interactor.createTask(Task.from(req.body.task));
+    const taskId = await this.interactor.createTask(Task.from(req.body.task), req['user'].username);
     res.status(201).json({ taskId });
   }
 
@@ -77,7 +77,7 @@ export class TaskModule {
     // if the above check passed, the task might not have an id property on it and it should be added manually
     task.id = req.params.id;
 
-    await this.interactor.updateTask(task);
+    await this.interactor.updateTask(task, req['user'].username);
     res.sendStatus(204);
   }
 
@@ -85,7 +85,7 @@ export class TaskModule {
   @authenticated
   @authorized(AccessGroup.ADMIN)
   private async deleteTask(req: Request, res: Response) {
-    await this.interactor.deleteTask(req.params.id);
+    await this.interactor.deleteTask(req.params.id, req['user'].username);
     res.sendStatus(204);
   }
 }

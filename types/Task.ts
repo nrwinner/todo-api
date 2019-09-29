@@ -1,17 +1,20 @@
 import { Insertable } from './generics/Insertable';
+import { UserIdentifier } from './User';
 
 export class Task extends Insertable {
   title: string;
+  author: string; // username;
   description?: string;
   date?: Date;
   completed: boolean = false;
   lastUpdated: Date;
 
   constructor();
-  constructor(id: string, title: string, lastUpdated: Date, description?: string, date?: Date, completed?: boolean);
-  constructor(id?: string, title?: string, lastUpdated?: Date, description?: string, date?: Date, completed?: boolean) {
+  constructor(id: string, author: string, title: string, lastUpdated: Date, description?: string, date?: Date, completed?: boolean);
+  constructor(id?: string, author?: string, title?: string, lastUpdated?: Date, description?: string, date?: Date, completed?: boolean) {
     super(id);
 
+    this.author = author;
     this.title = title;
     this.description = description;
     this.date = date;
@@ -36,6 +39,10 @@ export class Task extends Insertable {
 
     if (data.id) {
       t.id = data.id;
+    }
+
+    if (data.author) {
+      t.author = data.author;
     }
 
     if (data.title) {

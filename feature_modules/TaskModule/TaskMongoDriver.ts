@@ -2,7 +2,7 @@ import { TaskDataStore } from './TaskDataStore';
 import { Task } from '../../types/Task';
 import { TaskQuery } from '../../types/Query';
 import { Db, ObjectId, MongoClient } from 'mongodb';
-import { ResourceErrorType, ServiceError } from '../../errors/Error';
+import { ResourceErrorType, ServiceError, RequestErrorType } from '../../errors/Error';
 import { MongoConnector } from '../../mongo/connect';
 
 enum Collections {
@@ -30,7 +30,7 @@ export class TaskMongoDriver implements TaskDataStore {
     }
   }
 
-  async getTask(taskId: string): Promise<Task> {
+  async getTask(taskId: string, author: string): Promise<Task> {
     let objectId: ObjectId;
 
     try {
@@ -39,7 +39,7 @@ export class TaskMongoDriver implements TaskDataStore {
       throw ResourceErrorType.NOT_FOUND();
     }
 
-    const task = await (await this.db).collection(Collections.TASKS).findOne({ '_id': objectId });
+    const task = await (await this.db).collection(Collections.TASKS).findOne({ _id: objectId, author });
 
     if (!task) {
       // task wasn't found
@@ -50,13 +50,14 @@ export class TaskMongoDriver implements TaskDataStore {
     return Task.from(task) as Task;
   }
 
-  async getTasks(query: TaskQuery): Promise<Task[]> {
+  async getTasks(query: TaskQuery, author: string): Promise<Task[]> {
     const _query = {};
 
     // build _query object
     if (query.title) {
       _query['title'] = {
-        $regex: query.title
+        $regex: query.title,
+        $options: 'i'
       }
     }
 
@@ -91,7 +92,7 @@ export class TaskMongoDriver implements TaskDataStore {
       delete _query['dueDate'];
     }
 
-    let cursor = await (await this.db).collection(Collections.TASKS).find(_query);
+    let cursor = await (await this.db).collection(Collections.TASKS).find({ ..._query, author });
 
     if (query.offset) {
       cursor.skip(query.offset)
@@ -111,7 +112,7 @@ export class TaskMongoDriver implements TaskDataStore {
     return result.insertedId.toHexString();
   }
 
-  async updateTask(task: Partial<Task>): Promise<void> {
+  async updateTask(task: Partial<Task>, author: string): Promise<void> {
     let objectId: ObjectId;
 
     try {
@@ -120,14 +121,14 @@ export class TaskMongoDriver implements TaskDataStore {
       throw ResourceErrorType.NOT_FOUND();
     }
 
-    const result = await (await this.db).collection(Collections.TASKS).updateOne({ _id: objectId }, { $set: task.insertable })
+    const result = await (await this.db).collection(Collections.TASKS).updateOne({ _id: objectId, author }, { $set: task.insertable })
 
     if (result.matchedCount === 0) {
       throw ResourceErrorType.NOT_FOUND();
     }
   }
 
-  async deleteTask(taskId: string): Promise<void> {
+  async deleteTask(taskId: string, author: string): Promise<void> {
     let objectId: ObjectId;
 
     try {
@@ -136,7 +137,7 @@ export class TaskMongoDriver implements TaskDataStore {
       throw ResourceErrorType.NOT_FOUND();
     }
 
-    const result = await (await this.db).collection(Collections.TASKS).deleteOne({ _id: objectId })
+    const result = await (await this.db).collection(Collections.TASKS).deleteOne({ _id: objectId, author })
 
     if (result.deletedCount === 0) {
       throw ResourceErrorType.NOT_FOUND();
